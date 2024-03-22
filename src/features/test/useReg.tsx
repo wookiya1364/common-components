@@ -1,19 +1,33 @@
-import React, { useState } from "react";
+import { Facebook, Telegram, Twitter, Youtube } from "@shared/index";
+import React, { ReactElement, useState } from "react";
 
-type TChildren = {
-  children: React.ReactNode;
-};
+export default function useReg() {
+  const [step, setStep] = useState<th | undefined>();
 
-export default function useReg(t: string) {
-  const [step, setStep] = useState(t);
-  
-  const Step: React.FC<TChildren> = ({ children }) => {
-    return <>{children}</>;
+  const Step: React.FC<TNameChildren> = ({ children, name }) => {
+    const Icons = {
+      youtube: <Youtube />,
+      facebook: <Facebook />,
+      telegram: <Telegram />,
+      twitter: <Twitter />,
+    }[name!];
+
+    return <>{children || Icons}</>;
   };
 
-  const Reg = ({ children }: any) => {
-    const targetStep = children?.find((tStep:any) => tStep.props.name === step);
-    return Object.assign(targetStep, { Step });
+  const Reg: React.FC<TNameChildren> & { Step: React.FC<TNameChildren> } = ({
+    children,
+  }) => {
+    let targetStep: ReactElement | undefined;
+
+    React.Children.forEach(children, (child) => {
+      if (React.isValidElement(child) && child.props.name === step) {
+        targetStep = child;
+      }
+    });
+    return <>{targetStep}</>;
   };
-  return [Reg, setStep];
+
+  Reg.Step = Step;
+  return [Reg, setStep] as const;
 }

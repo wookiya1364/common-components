@@ -4,6 +4,7 @@ type KeyValue = {
 
 type TDefaultProps = {
   className?: string;
+  name?: string;
   children?: React.ReactNode;
 };
 
@@ -29,33 +30,7 @@ type TDynamicRoute = {
 type TID = {
   id: string;
 };
-type TTokenInfo = {
-  name: string;
-  src: string;
-  price: string;
-  href: string;
-}
-type TGame = {
-  title: string;
-  message: string;  
-  img: string;
-}
-type TGameTitle = Pick<TGame, "title">;
-type TGalleryTitle = {
-  className?: string;
-  inView: boolean;
-  description: string;
-}
-type TVideoGalleryTitle = {
-  inView: boolean;
-  description: string;
-}
-type TVideoGallery = {
-  title: string;
-  src: string;
-  m3u8: string;
-}
-type TGallery = {
-  src: string;
-  description: string;
-}
+
+type th = "youtube" | "facebook" | "telegram" | "twitter";
+
+type TNameChildren = Omit<TDefaultProps, "className">

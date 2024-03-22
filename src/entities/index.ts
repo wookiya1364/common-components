@@ -1,0 +1,1 @@
+export { FrameSelect } from "@entities/frame-select/page";

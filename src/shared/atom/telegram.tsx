@@ -2,7 +2,7 @@ import Link from "next/link";
 
 const Telegram = () => {
   return (
-    <Link target="_blank" href={"https://t.me/WEMIX_ANNouncement"}>
+    <Link target="_blank" href={""}>
       <svg
         className="reverse-fill-color"
         width="18"

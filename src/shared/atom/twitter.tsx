@@ -2,7 +2,7 @@ import Link from "next/link";
 
 const Twitter = () => {
   return (
-    <Link target="_blank" href={"https://twitter.com/WemixNetwork"}>
+    <Link target="_blank" href={""}>
       <svg
         className="reverse-fill-color"
         width="18"

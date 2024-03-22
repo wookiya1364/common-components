@@ -2,7 +2,7 @@ import Link from "next/link";
 
 const Facebook = () => {
   return (
-    <Link target="_blank" href={"https://www.facebook.com/WEMIXGames"}>
+    <Link target="_blank" href={""}>
       <svg
         className="reverse-fill-color"
         width="18"

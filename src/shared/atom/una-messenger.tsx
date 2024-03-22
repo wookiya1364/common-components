@@ -2,7 +2,7 @@ import Link from "next/link";
 
 const UnaMessenger = () => {
   return (
-    <Link target="_blank" href={"https://www.unamessenger.com/"}>
+    <Link target="_blank" href={""}>
       <svg
         className="reverse-fill-color"
         xmlns="http://www.w3.org/2000/svg"

@@ -4,7 +4,7 @@ const Youtube = () => {
   return (
     <Link
       target="_blank"
-      href={"https://www.youtube.com/channel/UCm7NfySSdy2ljrnh64cUJXA"}
+      href={""}
     >
       <svg
         className="reverse-fill-color"
