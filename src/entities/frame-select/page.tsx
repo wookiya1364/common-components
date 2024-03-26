@@ -2,10 +2,21 @@ import React from "react";
 
 interface IFrameSelect extends React.HTMLAttributes<HTMLSelectElement> {
   as?: React.ReactNode;
-  label?: string;
+  trigger: string;
+  label: string;
+  value: string;
+  onChange: () => void;
+  options: [];
 }
 
-const FrameSelect = ({ children, className, as, label }: IFrameSelect) => {
+const FrameSelect = ({
+  children,
+  trigger,
+  label,
+  value,
+  onChange,
+  options,
+}: IFrameSelect) => {
   return <div>{children}</div>;
 };
 

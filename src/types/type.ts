@@ -2,6 +2,11 @@ type KeyValue = {
   [key: string]: string | number | boolean | null | undefined;
 };
 
+type TOption = {
+  label: string;
+  value: string | number;
+};
+
 type TDefaultProps = {
   className?: string;
   name?: string;
@@ -33,4 +38,4 @@ type TID = {
 
 type th = "youtube" | "facebook" | "telegram" | "twitter";
 
-type TNameChildren = Omit<TDefaultProps, "className">
+type TNameChildren = Omit<TDefaultProps, "className">;
