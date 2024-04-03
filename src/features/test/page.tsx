@@ -7,6 +7,7 @@ import useReg from "./useReg";
 export default function Test() {
   const list: th[] = ["youtube", "facebook", "telegram", "twitter"];
   const [Reg, setStep] = useReg();
+
   return (
     <Column as="article" className="w-[300px]">
       {list.map((data: th, idx: number) => {

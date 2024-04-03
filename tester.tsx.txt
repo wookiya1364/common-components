@@ -1,0 +1,177 @@
+"use client";
+
+import React, {
+  ReactNode,
+  createContext,
+  useCallback,
+  useContext,
+  useMemo,
+} from "react";
+
+type TChaserInspectReturn = {
+  target: string;
+  byte: number;
+};
+
+type TOrientation = "top-left" | "top-right" | "bottom-left" | "bottom-right";
+
+// Chaser 컨텍스트를 생성합니다.
+const ChaserContext = createContext<{ register: (obj: object) => void } | null>(
+  null
+);
+
+const useChaser = () => {
+  const context = useContext(ChaserContext);
+  if (!context) {
+    throw new Error("useChaser must be used within a ChaserProvider");
+  }
+  console.log(context);
+  return context;
+};
+
+const KEY_START_INDEX: number = 0;
+const KEY_END_INDEX: number = 10;
+
+/**
+ * charCode >> 11은 charCode를 11비트 오른쪽으로 시프트합니다. 결과가 0이 아니라면 (즉, charCode가 2048 이상이라면), 현재 문자는 최소 3바이트를 필요
+ * charCode >> 7이 0이 아니라면 (charCode가 128 이상이라면), 현재 문자는 2바이트를 필요
+ * 그 외의 경우는 현재 문자가 ASCII 문자로 간주되어 1바이트만 필요
+ * @param object
+ * @returns
+ */
+const getByteLength = (object: any): number => {
+  let length: number = 0;
+  let targetString = String(object);
+  for (let idx = 0; idx < targetString.length; idx++) {
+    const charCode: number = targetString.charCodeAt(idx);
+    length += charCode >> 11 ? 3 : charCode >> 7 ? 2 : 1;
+  }
+  return length;
+};
+
+const keybyObject = (object: any, byte = 0): TChaserInspectReturn => ({
+  target: object,
+  byte,
+});
+
+const inspectObjectType = (value: any): string => {
+  // 원시 타입 처리
+  if (
+    value === null ||
+    (typeof value !== "object" && typeof value !== "function")
+  ) {
+    return value;
+  }
+
+  // 함수 처리
+  if (typeof value === "function") {
+    return `Function: ${value.name || "anonymous"}`;
+  }
+
+  // 배열 처리
+  if (Array.isArray(value)) {
+    const elements = value
+      .slice(KEY_START_INDEX, KEY_END_INDEX)
+      .map(inspectObjectType); // 성능을 위해 처음 10개 요소만 처리
+    return JSON.stringify(elements);
+  }
+
+  // 객체 처리
+  const entries = Object.entries(value).slice(KEY_START_INDEX, KEY_END_INDEX); // 성능을 위해 처음 10개 키-값 쌍만 처리
+  const props = entries.map(
+    ([target, val]) => `${target}: ${inspectObjectType(val)}`
+  );
+  return `{${props.join(", ")}}`;
+};
+
+const GarbageMonitor = ({
+  orientation,
+  garbage,
+}: {
+  orientation: TOrientation;
+  garbage?: TChaserInspectReturn[];
+}) => {
+  const orientationStyle = {
+    "bottom-left": "fixed bottom-0 left-0",
+    "bottom-right": "fixed bottom-0 right-0",
+    "top-left": "fixed top-0 left-0",
+    "top-right": "fixed top-0 right-0",
+  }[orientation];
+  console.log(garbage);
+
+  return (
+    <div className={orientationStyle}>
+      <p>.....</p>
+      <p>.....</p>
+    </div>
+  );
+};
+
+const ChaserInspect = ({
+  children,
+  orientation = "bottom-right",
+}: {
+  children: ReactNode;
+  orientation?: TOrientation;
+}) => {
+  const weakCache = useMemo(() => new WeakMap(), []);
+
+  // 객체 추적기를 생성하는 함수
+  const register = useCallback(
+    (object: any) => {
+      const finalReg = new FinalizationRegistry(
+        (object: TChaserInspectReturn | null | undefined) => {
+          const garbage = JSON.stringify(object?.target).replaceAll("\\", "");
+          const garbageSize = object?.byte;
+          const message = `${garbage} has been collected by the G.C`;
+          console.info(message, `${garbageSize} bytes`);
+          return message;
+        }
+      );
+
+      setTimeout(() => {
+        console.log("SETT");
+        console.log(weakCache.get(keybyObject(identifier, byte)));
+      }, 2000);
+
+      const identifier = inspectObjectType(object);
+      const byte = getByteLength(object);
+      if (!weakCache.has(object)) {
+        // const garbages = keybyObject(identifier, byte);
+        // setGarbageRegister((prev) => ({ ...prev, garbages }));
+        // 데이터를 WeakMap에 저장
+        weakCache.set(keybyObject(identifier, byte), identifier);
+        // finalReg에 객체를 등록. 여기서 객체가 수집될 때 콜백으로 전달할 이름을 지정합니다.
+        finalReg.register(
+          keybyObject(identifier, byte),
+          keybyObject(identifier, byte)
+        );
+      }
+    },
+    [weakCache]
+  );
+
+  return (
+    <ChaserContext.Provider value={{ register }}>
+      {children}
+      <GarbageMonitor orientation={orientation} />
+    </ChaserContext.Provider>
+  );
+
+  // const { register, garbageInfo } = useFinalizationRegistry();
+
+  // // 객체를 등록하는 컨텍스트 값 제공
+  // const value = { register };
+
+  // console.log(value);
+
+  // return (
+  //   <ChaserContext.Provider value={value}>
+  //     {children}
+  //     <GarbageMonitor orientation={orientation} garbage={garbageInfo} />
+  //   </ChaserContext.Provider>
+  // );
+};
+
+export default ChaserInspect;
+export { useChaser };
